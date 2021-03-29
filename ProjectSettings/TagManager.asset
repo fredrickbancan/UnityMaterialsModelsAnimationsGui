@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ragdoll Spawn
   - Elevator Trigger
+  - Hud
   layers:
   - Default
   - TransparentFX

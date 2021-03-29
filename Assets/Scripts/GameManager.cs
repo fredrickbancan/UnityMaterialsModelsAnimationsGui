@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -6,12 +7,15 @@ public class GameManager : MonoBehaviour
 
     private GameObject playerSpawn = null;
     private GameObject[] ragdollSpawns = null;
-    
     [SerializeField]
     private GameObject playerPrefab = null;
 
     [SerializeField]
     private GameObject ragdollPrefab = null;
+
+    private GameObject pausePanel = null;
+
+    private bool paused = false;
 
     private bool error = false;
 
@@ -20,7 +24,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        if(instance)
+        if (instance)
         {
             Destroy(gameObject);
         }
@@ -28,16 +32,22 @@ public class GameManager : MonoBehaviour
         {
             DontDestroyOnLoad(this);
             instance = this;
+            Debug.Log("GameManager Awake()");
         }
     }
 
-    /// <summary>
-    /// get all requried objects and spawn ragdolls
-    /// </summary>
-    void Start()
+    public void init(GameObject pausePanelRef)
     {
+        if(this != instance)
+        {
+            Debug.LogError("Singleton inconsistency detected (GameManager.init())");
+        }
+
+        Debug.Log("GameManager Initializing");
+
         playerSpawn = GameObject.Find("PlayerSpawn");
-        if(!playerSpawn)
+
+        if (!playerSpawn)
         {
             Debug.LogError("GameManager could not find player spawn point object!");
             error = true;
@@ -48,7 +58,7 @@ public class GameManager : MonoBehaviour
 
         ragdollSpawns = GameObject.FindGameObjectsWithTag("Ragdoll Spawn");
 
-        if(ragdollSpawns == null || ragdollSpawns.Length == 0)
+        if (ragdollSpawns == null || ragdollSpawns.Length == 0)
         {
             Debug.LogError("GameManager could not find any ragdoll spawn points!");
             error = true;
@@ -56,6 +66,16 @@ public class GameManager : MonoBehaviour
         }
 
         spawnRagdolls();
+
+        pausePanel = pausePanelRef;
+        if (pausePanel == null)
+        {
+            Debug.LogError("GameManager is provided with null pausePanel object!");
+            error = true;
+            return;
+        }
+
+        pauseUnpauseGame();
     }
 
     public void spawnPlayer()
@@ -67,6 +87,42 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instantiate(playerPrefab, playerSpawn.transform.position, playerSpawn.transform.rotation);
+    }
+
+    public static bool isPaused()
+    {
+        return instance.paused;
+    }
+
+    public static void pauseUnpauseGame()
+    {
+        instance.paused = !instance.paused;
+        if(instance.paused)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            instance.pausePanel.SetActive(true);
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+            instance.pausePanel.SetActive(false);
+            Cursor.visible = false;
+        }
+    }
+
+    public void respawnPlayer()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void quitGame()
+    { 
+     #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+     #else
+        Application.Quit();
+     #endif
     }
 
     public void spawnRagdolls()

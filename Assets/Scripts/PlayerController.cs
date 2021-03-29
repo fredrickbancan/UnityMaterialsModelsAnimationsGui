@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Confined;
-
+        Cursor.visible = false;
         if (player == null)
         {
             Debug.LogError("PlayerController is provided with null player object!");
@@ -86,27 +86,35 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (error) return;
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameManager.pauseUnpauseGame();
+        }
 
-        updateCamera();
+        if (!GameManager.isPaused())
+        {
+            updateCamera();
 
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
-        float moveJump = Input.GetAxis("Jump");
+            float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveVertical = Input.GetAxis("Vertical");
+            float moveJump = Input.GetAxis("Jump");
 
-        Vector3 move = transform.right * moveHorizontal + transform.forward * moveVertical;
+            Vector3 move = transform.right * moveHorizontal + transform.forward * moveVertical;
+
+            if (controller.isGrounded)//If the player is on a solid surface
+            {
+                if (playerVelocity.y < 0.0F) playerVelocity.y = 0.0F;
+
+                if (moveJump != 0.0F)//jump
+                {
+                    playerVelocity.y += Mathf.Sqrt(jumpHeight * 3.0f * -Physics.gravity.y);
+                }
+            }
+            controller.Move(move * accel * Time.deltaTime);
+        }
 
         playerVelocity += Physics.gravity * Time.deltaTime;
-
-        if (controller.isGrounded)//If the player is on a solid surface
-        {
-            if (playerVelocity.y < 0.0F) playerVelocity.y = 0.0F;
-
-            if (moveJump != 0.0F)//jump
-            {
-                playerVelocity.y += Mathf.Sqrt(jumpHeight * 3.0f * -Physics.gravity.y);
-            }
-        }
-        controller.Move(move * accel * Time.deltaTime);
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
@@ -124,14 +132,13 @@ public class PlayerController : MonoBehaviour
 
     private void updateCamera()
     {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
-
         camRotX -= mouseY;
         // Clamp the camera to limit it from being able to look to far down, ending up looking behind the player
         // So we say you can look as far as straight up or straight down.
         camRotX = Mathf.Clamp(camRotX, -90f, 90f);
-
-        Cursor.visible = false;
         playerCam.transform.localRotation = Quaternion.Euler(camRotX, 0f, 0f);
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
 
