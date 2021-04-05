@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     private GameObject player = null;
 
     [SerializeField]
+    private Animator anim = null;
+
+    [SerializeField]
     private float accel = 10.0F;
 
     [SerializeField]
@@ -55,6 +58,13 @@ public class PlayerController : MonoBehaviour
             error = true;
         }
 
+        if (anim == null)
+        {
+            Debug.LogError("PlayerController provided with null animator object!");
+            error = true;
+        }
+        anim.speed = 2.0F;
+
         playerCam = player.GetComponentInChildren<Camera>();
 
         if(playerCam == null)
@@ -99,6 +109,8 @@ public class PlayerController : MonoBehaviour
             float moveHorizontal = Input.GetAxis("Horizontal");
             float moveVertical = Input.GetAxis("Vertical");
             float moveJump = Input.GetAxis("Jump");
+
+            anim.SetBool("isMoving", moveHorizontal != 0 || moveVertical != 0);
 
             Vector3 move = transform.right * moveHorizontal + transform.forward * moveVertical;
 
