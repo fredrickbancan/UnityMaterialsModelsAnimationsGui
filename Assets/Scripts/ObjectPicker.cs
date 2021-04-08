@@ -5,14 +5,17 @@
 /// </summary>
 public class ObjectPicker : MonoBehaviour
 {
+    /// <summary>
+    /// Reference to player object
+    /// </summary>
     [SerializeField]
     private GameObject player = null;
 
-    private GameObject currentPickedObject = null;
+    private GameObject currentPickedObject = null;//reference to the gameobject being picked
 
-    private GameObject grabAnchor = null;
+    private GameObject grabAnchor = null;//empty gameobject of which the springjoint constraint is attached to, to simulate gravbbing in a dynamic way
 
-    private Camera playerCam = null;
+    private Camera playerCam = null;//reference to the players camera object
 
     private SpringJoint grabSpring = null;//spring connected to grabbed object
 
@@ -20,6 +23,9 @@ public class ObjectPicker : MonoBehaviour
 
     private bool error = false;
 
+    /// <summary>
+    /// Get all gameobjects and configure
+    /// </summary>
     void Start()
     {
         if (player == null)
@@ -46,6 +52,9 @@ public class ObjectPicker : MonoBehaviour
         grabAnchorBody.constraints = RigidbodyConstraints.FreezeAll;
     }
 
+    /// <summary>
+    /// Detect input and manipulate scene
+    /// </summary>
     void Update()
     {
         if (error) return;
@@ -75,7 +84,10 @@ public class ObjectPicker : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Attaches and configures a springjoint to the rigidbody of the picked object so it can be dragged around
+    /// </summary>
+    /// <param name="grabPos">3D position at which the springjoint will be attached</param>
     private void doStuffWithPickedObject(Vector3 grabPos)
     {
         grabAnchor.transform.position = grabPos;
@@ -89,7 +101,9 @@ public class ObjectPicker : MonoBehaviour
         grabSpring.massScale = 100.0F;
     }
 
-
+    /// <summary>
+    /// Called when the mouse is released while an object is grabbed. Removes the correct SpringJoint constraint from the target
+    /// </summary>
     private void onObjectUnPick()
     {
         SpringJoint[] pickedObjectSprings = currentPickedObject.GetComponents<SpringJoint>();

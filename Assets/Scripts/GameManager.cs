@@ -1,21 +1,42 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Static singleton gamemanager object. Usefull for preserving information and states between scene loading.
+/// A non-static helper script may be needed to provide this script with correct information
+/// </summary>
 public class GameManager : MonoBehaviour
 {
+    /// <summary>
+    /// Static singleton instance of the game manager
+    /// </summary>
     public static GameManager instance = null;
 
+    /// <summary>
+    /// Empty gameobject where the player will spawn
+    /// </summary>
     private GameObject playerSpawn = null;
+
+    /// <summary>
+    /// Array of empty gameobjects where ragdolls should be spawned
+    /// </summary>
     private GameObject[] ragdollSpawns = null;
+
+    /// <summary>
+    /// Prefab of player object for being spawned in level
+    /// </summary>
     [SerializeField]
     private GameObject playerPrefab = null;
 
+    /// <summary>
+    /// Prefab of ragdoll object for being spawned in level
+    /// </summary>
     [SerializeField]
     private GameObject ragdollPrefab = null;
 
-    private GameObject pausePanel = null;
+    private GameObject pausePanel = null;//reference to GUI panel which is  shown/hidden depending on if the game is paused
 
-    private bool paused = false;
+    private bool paused = false;//true if game is paused
 
     private bool error = false;
 
@@ -32,10 +53,14 @@ public class GameManager : MonoBehaviour
         {
             DontDestroyOnLoad(this);
             instance = this;
-            Debug.Log("GameManager Awake()");
+            Debug.Log("GameManager Awake()");//debugging purposes
         }
     }
 
+    /// <summary>
+    /// Initialize or re-initialize game objects and states
+    /// </summary>
+    /// <param name="pausePanelRef">reference to GUI panel which is  shown/hidden depending on if the game is paused</param>
     public void init(GameObject pausePanelRef)
     {
         if(this != instance)
@@ -43,7 +68,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("Singleton inconsistency detected (GameManager.init())");
         }
 
-        Debug.Log("GameManager Initializing");
+        Debug.Log("GameManager Initializing");//debugging purposes
 
         playerSpawn = GameObject.Find("PlayerSpawn");
 
@@ -78,6 +103,9 @@ public class GameManager : MonoBehaviour
         pauseUnpauseGame();
     }
 
+    /// <summary>
+    /// Spawn player at the player spawn location and rotation
+    /// </summary>
     public void spawnPlayer()
     {
         if (!playerPrefab)
@@ -94,17 +122,22 @@ public class GameManager : MonoBehaviour
         return instance.paused;
     }
 
+    /// <summary>
+    /// Toggles the game being paused
+    /// </summary>
     public static void pauseUnpauseGame()
     {
         instance.paused = !instance.paused;
         if(instance.paused)
         {
+            //show and unlock curser, and set the pause panel to active
             Cursor.lockState = CursorLockMode.None;
             instance.pausePanel.SetActive(true);
             Cursor.visible = true;
         }
         else
         {
+            //hide and lock curser, and set the pause panel to inactive
             Cursor.lockState = CursorLockMode.Confined;
             instance.pausePanel.SetActive(false);
             Cursor.visible = false;
@@ -119,12 +152,15 @@ public class GameManager : MonoBehaviour
     public void quitGame()
     { 
      #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        UnityEditor.EditorApplication.isPlaying = false;//If this app is being run in the unity editor then stop the playing, otherwise Application.Quit() can be called
      #else
         Application.Quit();
      #endif
     }
 
+    /// <summary>
+    /// Spawns instances of ragdoll prefab at each ragdoll spawn location and rotation
+    /// </summary>
     public void spawnRagdolls()
     {
         if (!ragdollPrefab)

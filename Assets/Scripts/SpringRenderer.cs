@@ -6,28 +6,33 @@ using UnityEngine;
 /// </summary>
 public class SpringRenderer : MonoBehaviour
 {
+    /// <summary>
+    /// reference to a line renderer prefab
+    /// </summary>
     [SerializeField]
     private LineRenderer lrPrefab = null;
 
-    private List<LineRenderer> lrList = null;
+    private List<LineRenderer> lrList = null;//list of linerenderers which are currently renderering lines for this object
+
     void Start()
     {
         lrList = new List<LineRenderer>();
     }
 
     /// <summary>
-    /// For each spring join attached to the object, have a line renderer for it and render a line between the two objects.
+    /// For each spring joint attached to the object, have a line renderer for it and render a line between the two objects.
     /// This code keeps the list of line renderers the same size as the number of spring joints, removing un-used ones and adding required ones.
     /// This makes it so this script and render as many spring joints as needed.
     /// </summary>
     void Update()
     {
-        SpringJoint[] joints = gameObject.GetComponents<SpringJoint>();
+        SpringJoint[] joints = gameObject.GetComponents<SpringJoint>();//get all spring joint constraints
 
         if (joints != null && joints.Length > 0)
         {
             int dif = lrList.Count - joints.Length;
 
+            //remove any line renderers which are un-needed incase a springjoint was removed from the object at any point
             for (int i = 0; i < dif; i++)
             {
                 Destroy(lrList[(joints.Length - 1) + i]);
@@ -48,7 +53,7 @@ public class SpringRenderer : MonoBehaviour
                 lrList[i].SetPosition(1, transform.position);
             }
         }
-        else
+        else//if there are no springjoints on the object then remove all existing linerenderers
         {
             foreach (LineRenderer l in lrList)
             {

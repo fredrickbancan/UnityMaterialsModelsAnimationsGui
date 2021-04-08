@@ -5,24 +5,41 @@
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
+    /// <summary>
+    /// Reference to the player object
+    /// </summary>
     [SerializeField]
     private GameObject player = null;
 
+    /// <summary>
+    /// Reference to the animation controller for the player
+    /// </summary>
     [SerializeField]
     private Animator anim = null;
 
+    /// <summary>
+    /// units per second the player moves at
+    /// </summary>
     [SerializeField]
-    private float accel = 10.0F;
+    private float speed = 10.0F;
 
+    /// <summary>
+    /// Height in y units the player will jump to
+    /// </summary>
     [SerializeField]
     private float jumpHeight = 1.0f;
 
+    /// <summary>
+    /// force at which the player will push object out of the way when moving towards them and colliding with them
+    /// </summary>
     [SerializeField]
     private float objectPushForce = 172.0F;
 
+    /// <summary>
+    /// Multiplier for mouse movement of camera
+    /// </summary>
     [SerializeField]
     private float mouseSensitivity = 3.5F;
-
 
     private Vector3 playerVelocity = new Vector3();
 
@@ -97,12 +114,13 @@ public class PlayerController : MonoBehaviour
     {
         if (error) return;
         
+        //Pause game if escape button pressed
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             GameManager.pauseUnpauseGame();
         }
 
-        if (!GameManager.isPaused())
+        if (!GameManager.isPaused())//only accept input and move character if game is not paused
         {
             updateCamera();
 
@@ -123,7 +141,7 @@ public class PlayerController : MonoBehaviour
                     playerVelocity.y += Mathf.Sqrt(jumpHeight * 3.0f * -Physics.gravity.y);
                 }
             }
-            controller.Move(move * accel * Time.deltaTime);
+            controller.Move(move * speed * Time.deltaTime);
         }
 
         playerVelocity += Physics.gravity * Time.deltaTime;
@@ -142,6 +160,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// rotate camera and player based on mouse movement
+    /// </summary>
     private void updateCamera()
     {
         Cursor.lockState = CursorLockMode.Confined;

@@ -5,28 +5,43 @@
 /// </summary>
 public class ElevatorTrigger : MonoBehaviour
 {
+    /// <summary>
+    /// Reference to gameobject which acts as elevator platorm and is moved up/down
+    /// </summary>
     [SerializeField]
     private GameObject elevatorPlatform = null;
 
+    /// <summary>
+    /// Height in y units at which the elevator platform will be at when the elevator is at "floor 0"
+    /// </summary>
     [SerializeField]
     private float groundFloorHeight = 0.5F;
 
+    /// <summary>
+    /// Height in y units at which the elevator platform will be at when the elevator is at "top floor"
+    /// </summary>
     [SerializeField]
     private float topFloorHeight = 15.0F;
 
+    /// <summary>
+    /// number of seconds for the elevator to wait when object enters or exits the trigger before moving
+    /// </summary>
     [SerializeField]
-    private float enterExitTimerSeconds = 1.0F;//number of seconds for the elevator to wait when object enters or exits the trigger before moving
-
+    private float enterExitTimerSeconds = 1.0F;
+    
+    /// <summary>
+    /// units per second at which the elevator will move
+    /// </summary>
     [SerializeField]
     private float moveSpeed = 1.0F;
 
-    private bool isProgressing = false;
+    private bool isProgressing = false;//true if elevator is moving towards top floor, else elevator is moving towards bottom floor.
 
-    private bool hasPassenger = false;
+    private bool hasPassenger = false;//true if an object is in the trigger
 
     private float touchTimer = 0.0F;//how long an object has been in the trigger
 
-    private CharacterController playerPassenger = null;//used for moving the player manually to avoid issues
+    private CharacterController playerPassenger = null;//used for moving the player manually to avoid physics issues
 
     private bool error;
 
@@ -50,7 +65,8 @@ public class ElevatorTrigger : MonoBehaviour
                 if (elevatorPlatform.transform.position.y < topFloorHeight)
                 {
                     elevatorPlatform.transform.Translate(Vector3.up * moveSpeed * Time.deltaTime, Space.World);
-                    if (playerPassenger != null)
+
+                    if (playerPassenger != null)//if the passenger is a player
                     {
                         playerPassenger.Move(Vector3.up * moveSpeed * Time.deltaTime);
                     }
@@ -61,7 +77,7 @@ public class ElevatorTrigger : MonoBehaviour
                 if (elevatorPlatform.transform.position.y > topFloorHeight)
                     elevatorPlatform.transform.Translate(-Vector3.up * moveSpeed * Time.deltaTime, Space.World);
 
-                if (playerPassenger != null)
+                if (playerPassenger != null)//if the passenger is a player
                 {
                     playerPassenger.Move(-Vector3.up * moveSpeed * Time.deltaTime);
                 }
@@ -73,7 +89,8 @@ public class ElevatorTrigger : MonoBehaviour
             {
                 if (elevatorPlatform.transform.position.y > groundFloorHeight)
                     elevatorPlatform.transform.Translate(-Vector3.up * moveSpeed * Time.deltaTime, Space.World);
-                if (playerPassenger != null)
+
+                if (playerPassenger != null)//if the passenger is a player
                 {
                     playerPassenger.Move(-Vector3.up * moveSpeed * Time.deltaTime);
                 }
@@ -82,7 +99,8 @@ public class ElevatorTrigger : MonoBehaviour
             {
                 if (elevatorPlatform.transform.position.y < groundFloorHeight)
                     elevatorPlatform.transform.Translate(Vector3.up * moveSpeed * Time.deltaTime, Space.World);
-                if (playerPassenger != null)
+
+                if (playerPassenger != null)//if the passenger is a player
                 {
                     playerPassenger.Move(Vector3.up * moveSpeed * Time.deltaTime);
                 }
